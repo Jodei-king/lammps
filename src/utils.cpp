@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include "lammps.h"
 #include "error.h"
+#include "fmt/format.h"
 
 #if defined(__linux__)
 #include <unistd.h>  // for readlink
@@ -180,14 +181,15 @@ void utils::sfread(const char *srcname, int srcline, void *s, size_t size,
 
 /* ------------------------------------------------------------------ */
 
-std::string utils::check_packages_for_style(std::string style,
-                                            std::string name, LAMMPS *lmp)
+std::string utils::check_packages_for_style(const std::string &style,
+                                            const std::string &name,
+                                            LAMMPS *lmp)
 {
   std::string errmsg = "Unrecognized " + style + " style '" + name + "'";
   const char *pkg = lmp->match_style(style.c_str(),name.c_str());
 
   if (pkg) {
-    errmsg += " is part of the " + std::string(pkg) + " package";
+    errmsg += fmt::format(" is part of the {} package",pkg);
     if (lmp->is_installed_pkg(pkg))
       errmsg += ", but seems to be missing because of a dependency";
     else
