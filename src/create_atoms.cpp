@@ -585,12 +585,11 @@ void CreateAtoms::command(int narg, char **arg)
   // print status
 
   MPI_Barrier(world);
-  double time2 = MPI_Wtime();
-
   if (me == 0)
     utils::logmesg(lmp, fmt::format("Created {} atoms\n"
-                        "  create_atoms CPU = {} seconds\n",
-                        atom->natoms - natoms_previous, time2-time1));
+                        "  create_atoms CPU = {:<.3g} seconds\n",
+                        atom->natoms - natoms_previous,
+                        MPI_Wtime() - time1));
 }
 
 /* ----------------------------------------------------------------------
