@@ -175,7 +175,7 @@ add_headers(FMT_HEADERS chrono.h color.h compile.h core.h format.h format-inl.h
                         locale.h os.h ostream.h posix.h printf.h ranges.h)
 set(FMT_SOURCES src/format.cc src/os.cc)
 
-add_library(fmt ${FMT_SOURCES} ${FMT_HEADERS} README.rst)
+add_library(fmt STATIC ${FMT_SOURCES} ${FMT_HEADERS} README.rst)
 add_library(fmt::fmt ALIAS fmt)
 
 if (HAVE_STRTOD_L)
@@ -207,18 +207,6 @@ set(FMT_LIB_NAME fmt)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(FMT_LIB_NAME ${FMT_LIB_NAME}${FMT_DEBUG_POSTFIX})
 endif ()
-
-if (BUILD_SHARED_LIBS)
-  if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
-    # Fix rpmlint warning:
-    # unused-direct-shlib-dependency /usr/lib/libformat.so.1.1.0 /lib/libm.so.6.
-    target_link_libraries(fmt -Wl,--as-needed)
-  endif ()
-  target_compile_definitions(fmt PRIVATE FMT_EXPORT INTERFACE FMT_SHARED)
-endif ()
-if (FMT_SAFE_DURATION_CAST)
-  target_compile_definitions(fmt PUBLIC FMT_SAFE_DURATION_CAST)
-endif()
 
 add_library(fmt-header-only INTERFACE)
 add_library(fmt::fmt-header-only ALIAS fmt-header-only)
