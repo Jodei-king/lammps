@@ -84,6 +84,19 @@ bool utils::strmatch(std::string text, std::string pattern)
   return (pos >= 0);
 }
 
+/* This simplifies the repetitive task of outputting some
+ * message to both the screen and/or the log file. In combination
+ * with using fmt::format(), which returns the formatted text
+ * in a std::string() instance, this can be used to reduce
+ * operations previously requiring several lines of code to
+ * a single statement. */
+
+void utils::logmesg(LAMMPS *lmp, const std::string &mesg)
+{
+  if (lmp->screen)  fputs(mesg.c_str(), lmp->screen);
+  if (lmp->logfile) fputs(mesg.c_str(), lmp->logfile);
+}
+
 /** \brief try to detect pathname from FILE pointer. Currently only supported on Linux, otherwise will report "(unknown)".
  *
  *  \param buf  storage buffer for pathname. output will be truncated if not large enough

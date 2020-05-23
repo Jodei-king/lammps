@@ -36,6 +36,13 @@ namespace LAMMPS_NS {
      */
     bool strmatch(std::string text, std::string pattern);
 
+    /** \brief Send message to screen and logfile, if available
+     *
+     *  \param lmp   pointer to LAMMPS class instance
+     *  \param mesg  message to be printed
+     */
+    void logmesg(LAMMPS *lmp, const std::string &mesg);
+
     /** \brief safe wrapper around fgets() which aborts on errors
      *  or EOF and prints a suitable error message to help debugging
      *
