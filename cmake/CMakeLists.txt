@@ -354,18 +354,22 @@ mark_as_advanced( MATH_LIBRARIES )
 target_link_libraries(lammps PRIVATE ${MATH_LIBRARIES})
 
 ######################################
+# Generate Basic Style files
+######################################
+include(StyleHeaderUtils)
+RegisterStyles(${LAMMPS_SOURCE_DIR})
+
+######################################
 # Integrate {fmt} into build system  #
 ######################################
 get_filename_component(LAMMPS_FMTLIB_DIR ${LAMMPS_SOURCE_DIR}/../fmtlib ABSOLUTE)
 get_filename_component(LAMMPS_FMTLIB_BIN ${CMAKE_BINARY_DIR}/../fmtlib ABSOLUTE)
 add_subdirectory(${LAMMPS_FMTLIB_DIR} ${LAMMPS_FMTLIB_BIN})
 target_link_libraries(lammps PRIVATE fmt::fmt)
-
-######################################
-# Generate Basic Style files
-######################################
-include(StyleHeaderUtils)
-RegisterStyles(${LAMMPS_SOURCE_DIR})
+# detect copies from conventional make
+file(GLOB FMTLIB_SOURCES ${LAMMPS_SOURCE_DIR}/fmtlib_*.cpp)
+file(GLOB FMTLIB_HEADERS ${LAMMPS_SOURCE_DIR}/fmt/[^.]*.h)
+DetectBuildSystemConflict(${LAMMPS_SOURCE_DIR} ${FMTLIB_SOURCES} ${FMTLIB_HEADERS})
 
 ##############################################
 # add sources of enabled packages
