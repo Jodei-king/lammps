@@ -8,6 +8,8 @@
 /packages_*.h
 /lmpinstalledpkgs.h
 /lmpgitversion.h
+/fmt/*.h
+/fmtlib_*.cpp
 
 /*_gpu.h
 /*_gpu.cpp

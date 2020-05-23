@@ -19,8 +19,13 @@ LMPLINK=$(shell echo $(ARLIB) | sed -e 's,lib\([+0-9a-z_-]\+\)\.a$$,-L. -l\1,')
 OBJDIR =   Obj_$@
 OBJSHDIR = Obj_shared_$@
 
-SRC =   $(wildcard *.cpp)
-INC =   $(filter-out lmpinstalledpkgs.h lmpgitversion.h,$(wildcard *.h))
+FMTLIBINC_ORIG = $(wildcard ../fmtlib/include/fmt/*.h)
+FMTLIBSRC_ORIG = $(wildcard ../fmtlib/src/*.cc)
+FMTLIBINC = $(FMTLIBINC_ORIG:../fmtlib/include/%=%)
+FMTLIBSRC = $(FMTLIBSRC_ORIG:../fmtlib/src/%.cc=fmtlib_%.cpp)
+
+SRC =   $(wildcard *.cpp) $(FMTLIBSRC)
+INC =   $(filter-out lmpinstalledpkgs.h lmpgitversion.h,$(wildcard *.h)) $(FMTLIBINC)
 OBJ =   $(SRC:.cpp=.o)
 
 SRCLIB = $(filter-out main.cpp,$(SRC))
@@ -182,6 +187,18 @@ gitversion:
 	        mv ${TMPNAME}.lmpgitversion lmpgitversion.h || rm ${TMPNAME}.lmpgitversion ; \
         else mv ${TMPNAME}.lmpgitversion lmpgitversion.h ; fi
 
+# rules to copy/update sources imported from {fmt}
+
+fmt/%.h : ../fmtlib/include/fmt/%.h
+	@mkdir -p fmt
+	@cp -v $< $@
+
+fmtlib_%.cpp: ../fmtlib/src/%.cc
+	@cp -v $< $@
+
+copyfmtlib: $(FMTLIBINC) $(FMTLIBSRC)
+
+####################################################################################
 # Build LAMMPS in one of 2 modes
 # static = static compile in Obj_machine (default)
 # shared = shared compile in Obj_shared_machine
@@ -195,7 +212,7 @@ gitversion:
 	@echo 'Gathering installed package information (may take a little while)'
 	@$(SHELL) Make.sh style
 	@$(SHELL) Make.sh packages
-	@$(MAKE) $(MFLAGS) lmpinstalledpkgs.h gitversion
+	@$(MAKE) $(MFLAGS) lmpinstalledpkgs.h gitversion copyfmtlib
 	@echo 'Compiling LAMMPS for machine $@'
 	@if [ -f MAKE/MACHINES/Makefile.$@ ]; \
 	  then cp MAKE/MACHINES/Makefile.$@ $(objdir)/Makefile; fi
@@ -433,3 +450,4 @@ purge: Purge.list
 	@for f in `grep -v '#' Purge.list` ;		\
 	    do test -f $$f && rm $$f && echo $$f || : ;		\
 	done
+	@rm -rf $(FMTLIBSRC) fmt
